@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-node-affinity
+  namespace: taint-toleration-demo
+  labels:
+    app: taint-demo
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size
+            operator: In
+            values:
+            - Large
+            - Medium
+  containers:
+  - name: nginx
+    image: nginx:stable-alpine
+    imagePullPolicy: IfNotPresent
