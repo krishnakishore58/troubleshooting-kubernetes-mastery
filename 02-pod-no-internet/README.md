@@ -121,7 +121,7 @@ kubectl exec -it pod/curl-test -- curl -I https://www.google.com || true
 
 Restore CoreDNS (using backup):
 ```bash
-kubectl -n kube-system apply -f /tmp/coredns-orig.yaml
+kubectl -n kube-system replace --force -f /tmp/coredns-orig.yaml
 kubectl -n kube-system rollout restart deployment coredns
 kubectl -n kube-system rollout status deployment coredns --timeout=60s || true
 ```
