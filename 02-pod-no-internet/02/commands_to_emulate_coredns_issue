@@ -1,0 +1,7 @@
+ kubectl -n kube-system get configmap coredns -o yaml > /tmp/coredns-orig.yaml
+ kubectl -n kube-system patch configmap coredns --type merge -p '{"data":{"Corefile":" .:53 {\n forward . 192.0.2.1\n errors \n cache 30\n}\n"}}'
+ kubectl -n kube-system rollout restart deployment coredns
+ kubectl -n kube-system rollout status deployment coredns
+ kubectl exec -it pod/curl-test -- sh #nslookup google.com #nslookup kubernetes.default
+ 
+note: when network policy is applied, even nslookup doesn't work
