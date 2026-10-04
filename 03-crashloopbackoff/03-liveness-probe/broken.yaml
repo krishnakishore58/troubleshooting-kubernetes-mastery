@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bad-probe
+  namespace: crashloop-demo
+  labels:
+    app: bad-probe
+    scenario: "03-liveness-probe"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bad-probe
+  template:
+    metadata:
+      labels:
+        app: bad-probe
+    spec:
+      containers:
+      - name: web
+        image: nginx:stable-alpine
+        ports:
+        - containerPort: 80
+        # BUG: the app is HEALTHY (nginx serves "/" on port 80), but the
+        # liveness probe checks the WRONG path AND the WRONG port.
+        #  - /healthz does not exist on default nginx -> 404
+        #  - port 8080 is not listening -> connection refused
+        # initialDelaySeconds is also too short for any real app.
+        # The kubelet marks the container unhealthy and KILLS it on each
+        # failure. Repeated kills => CrashLoopBackOff with Reason: Error.
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 1
+          periodSeconds: 5
+          failureThreshold: 1

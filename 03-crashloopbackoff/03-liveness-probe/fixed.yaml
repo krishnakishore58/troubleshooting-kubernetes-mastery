@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bad-probe
+  namespace: crashloop-demo
+  labels:
+    app: bad-probe
+    scenario: "03-liveness-probe"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bad-probe
+  template:
+    metadata:
+      labels:
+        app: bad-probe
+    spec:
+      containers:
+      - name: web
+        image: nginx:1.27-alpine
+        ports:
+        - containerPort: 80
+        # FIX: probe the path and port the app actually serves ("/" on 80).
+        # Give the app time to boot (initialDelaySeconds) and tolerate a few
+        # transient failures (failureThreshold) before killing it.
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3

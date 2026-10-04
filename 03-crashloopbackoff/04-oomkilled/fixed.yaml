@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oom-app
+  namespace: crashloop-demo
+  labels:
+    app: oom-app
+    scenario: "04-oomkilled"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oom-app
+  template:
+    metadata:
+      labels:
+        app: oom-app
+    spec:
+      containers:
+      - name: hungry
+        image: busybox:1.36
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          echo "Allocating memory buffer..."
+          dd if=/dev/zero of=/dev/shm/fill bs=1M count=250
+          echo "done"
+          sleep 3600
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "50m"
+          # FIX: size the limit to the real working-set (with headroom) so the
+          # kernel OOM killer no longer terminates the container.
+          # The right long-term fix is often to REDUCE the app's memory usage;
+          # here the workload genuinely needs ~250Mi, so we grant 320Mi.
+          limits:
+            memory: "320Mi"
+            cpu: "100m"

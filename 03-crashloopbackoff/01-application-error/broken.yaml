@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-error
+  namespace: crashloop-demo
+  labels:
+    app: app-error
+    scenario: "01-application-error"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-error
+  template:
+    metadata:
+      labels:
+        app: app-error
+    spec:
+      containers:
+      - name: app
+        image: busybox:1.36
+        # BUG: the application starts, prints a message, then exits 1.
+        # A container whose PID 1 exits with a non-zero code is restarted
+        # by the kubelet. Repeated fast exits => CrashLoopBackOff.
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          echo "Starting payment-processor v1.4.2..."
+          echo "FATAL: could not connect to database (exit 1)"
+          exit 1
