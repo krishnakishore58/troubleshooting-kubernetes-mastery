@@ -13,12 +13,11 @@ spec:
       labels:
         app: app-private
     spec:
-      # NO imagePullSecrets defined — will fail to pull private image
-      imagePullSecrets:           # <-- add imagePullSecrets
+      imagePullSecrets:
       - name: regcred
       containers:
       - name: app
-        image: krishnakishore58/image_nginx:1.2  # <-- private registry (will fail)
+        image: krishnakishore58/image_nginx:1.1
         imagePullPolicy: Always
         ports:
         - containerPort: 80

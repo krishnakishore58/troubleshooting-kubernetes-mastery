@@ -38,6 +38,9 @@ logs almost always tell you.
 | 2 | [`02-image-pull-credentials`](02-image-pull-credentials/) | Private registry without imagePullSecrets or wrong credentials | `no basic auth credentials` or `401 Unauthorized` |
 | 3 | [`03-registry-unreachable`](03-registry-unreachable/) | Registry unreachable (network, DNS, firewall) | `dial tcp: lookup` / `connection refused` / `context deadline exceeded` |
 
+```bash
+kubectl create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username="krishnakishore58" --docker-password="xyz"
+```
 ---
 
 ## Quick demo loop (per scenario)
